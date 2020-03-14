@@ -45,6 +45,41 @@ namespace LearningApi.Controllers
                 .ToListAsync();
         }
 
+        [HttpGet("fullposts")]
+        [Route("fullposts")]
+        public async Task<ActionResult<IEnumerable<MultiplePosts>>> GetFullPosts([FromQuery] PostParameter postParameter)
+        {
+            var result = await _context.PostsDB
+                .OrderBy(a => a.Id)
+                .Where(a => a.PostTypeId == 1 && a.AcceptedAnswerId != null) // question
+                .Skip((postParameter.PageNumber - 1) * postParameter.PageSize)
+                .Take(postParameter.PageSize)
+                .Join(_context.PostsDB, // answer
+                    question => question.AcceptedAnswerId,
+                    answer => answer.Id,
+                    (question, answer) => new MultiplePosts
+                    {
+                        Question = question,
+                        Answer = answer
+                    }).ToListAsync();
+            return result;
+
+        }
+
+        [HttpGet("fullposts/{questionId}")]
+        public async Task<ActionResult<MultiplePosts>> GetFullPosts(int questionId) {
+            var result = await _context.PostsDB
+                .Where(question => question.PostTypeId == 1 && question.Id == questionId)
+                .Join(_context.PostsDB,
+                    question => question.AcceptedAnswerId,
+                    answer => answer.Id,
+                    (question, answer) => new MultiplePosts {
+                        Question = question,
+                        Answer = answer
+                    }).SingleOrDefaultAsync();
+            return result;
+        }
+
         // GET: api/Posts/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Post>> GetPostsDb(int? id)
