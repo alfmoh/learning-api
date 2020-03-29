@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Learning_Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LearningApi.Models
 {
@@ -12,6 +13,8 @@ namespace LearningApi.Models
 
         public virtual DbSet<Post> PostsDB { get; set; }
         public virtual DbSet<Tag> TagsDB { get; set; }
+
+        public virtual DbSet<User> Users { get; set; }
 
     }
 }
