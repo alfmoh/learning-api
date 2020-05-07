@@ -32,7 +32,7 @@ namespace Learning_Api.Controllers
             var userToCreate = new Models.User
             {
                 Email = userForRegisterDto.Email,
-                Name = userForRegisterDto.Username
+                Username = userForRegisterDto.Username
             };
 
             var createUser = await _repo.Register(userToCreate, userForRegisterDto.Password);
@@ -65,6 +65,7 @@ namespace Learning_Api.Controllers
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                 new Claim(ClaimTypes.NameIdentifier, userFromRepo.Id.ToString()),
+                new Claim(ClaimTypes.GivenName, userFromRepo.Username),
                 new Claim(ClaimTypes.Email, userFromRepo.Email)
                 }),
                 Expires = DateTime.Now.AddDays(1),

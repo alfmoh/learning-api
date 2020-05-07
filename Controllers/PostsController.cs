@@ -21,7 +21,7 @@ namespace LearningApi.Controllers
 
         // GET: api/questions
         [HttpGet]
-        [Route("questions")]
+        // [Route("questions")]
         public async Task<ActionResult<IEnumerable<Post>>> GetQuestions([FromQuery] PostParameter postParameter)
         {
             return await _context.PostsDB
@@ -34,7 +34,7 @@ namespace LearningApi.Controllers
 
         // GET: api/Answers
         [HttpGet("answers")]
-        [Route("answers")]
+        // [Route("answers")]
         public async Task<ActionResult<IEnumerable<Post>>> GetAnswers([FromQuery] PostParameter postParameter)
         {
             return await _context.PostsDB
@@ -46,7 +46,7 @@ namespace LearningApi.Controllers
         }
 
         [HttpGet("fullposts")]
-        [Route("fullposts")]
+        // [Route("fullposts")]
         public async Task<ActionResult<IEnumerable<MultiplePosts>>> GetFullPosts([FromQuery] PostParameter postParameter)
         {
             var result = await _context.PostsDB
@@ -77,6 +77,18 @@ namespace LearningApi.Controllers
                         Question = question,
                         Answer = answer
                     }).SingleOrDefaultAsync();
+            return result;
+        }
+
+        [HttpGet("tag")]
+        public async Task<ActionResult<Post>> GetTag([FromBody] string tagName)
+        {
+            var result = await _context.TagsDB
+                .Where(tag => tag.TagName == tagName)
+                .Join(_context.PostsDB,
+                tag => tag.WikiPostId,
+                post => post.Id,
+                (tag, post) => post).SingleOrDefaultAsync();
             return result;
         }
 
