@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Learning_Api.Models;
 using LearningApi.Data;
 using LearningApi.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -67,17 +68,24 @@ namespace LearningApi.Controllers
         }
 
         [HttpGet("fullposts/{questionId}")]
-        public async Task<ActionResult<MultiplePosts>> GetFullPosts(int questionId) {
-            var result = await _context.PostsDB
-                .Where(question => question.PostTypeId == 1 && question.Id == questionId)
-                .Join(_context.PostsDB,
-                    question => question.AcceptedAnswerId,
-                    answer => answer.Id,
-                    (question, answer) => new MultiplePosts {
-                        Question = question,
-                        Answer = answer
-                    }).SingleOrDefaultAsync();
+        public async Task<ActionResult<QuestionAnswers>> GetFullPosts(int questionId)
+        {
+            var questionsAnswers = await (from question in _context.PostsDB
+                                          where question.Id == questionId && question.PostTypeId == 1
+                                          join post in _context.PostsDB
+                                          on question.Id equals post.ParentId
+                                          into QuestionAnswers
+                                          from answer in QuestionAnswers
+                                          where answer.ParentId == questionId
+                                          select new { question, answer }).ToListAsync();
+            var result = (from post in questionsAnswers
+                          group post by post.question into g
+                          select new QuestionAnswers
+                          { Question = g.Key, Answers = g.ToList().Select(x => x.answer) })
+                          .FirstOrDefault();
+
             return result;
+
         }
 
         [HttpGet("tag")]
