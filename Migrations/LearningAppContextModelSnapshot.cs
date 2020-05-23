@@ -62,9 +62,6 @@ namespace Learning_Api.Migrations
                     b.Property<byte?>("PostTypeId")
                         .HasColumnType("tinyint");
 
-                    b.Property<int?>("QuestionId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("Score")
                         .HasColumnType("int");
 
